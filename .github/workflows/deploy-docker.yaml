@@ -1,0 +1,58 @@
+name: Deploy Project
+on:
+  push:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: oven/bun:1
+      env:
+        NODE_ENV: production
+
+    steps:
+      - name: Get Code
+        uses: actions/checkout@v4
+
+      # - name: Install Bun
+      #   uses: oven-sh/setup-bun@v2
+      #   with:
+      #     bun-version: 1.2.18
+
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.bun/install/cache
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
+
+      - name: Install Dependencies
+        run: bun i
+
+      - name: Build
+        run: bun run build
+
+      - name: upload dist folder
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: |
+            dist
+            public
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: download dist folder
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+
+      - name: List all files
+        run: ls -R
+
+      - name: Deploy
+        run: |
+          echo "Deploying version ${{ needs.build.outputs.package-version }}..."
+          echo "Commit: ${{ needs.build.outputs.build-hash }}"
