@@ -1,29 +1,15 @@
-name: Echo Vars and Secrets from Dev and Prod
+name: Echo Vars and Secrets
 on:
   workflow_dispatch:
 jobs:
-  echo-dev:
-    environment: "Development"
+  echo-vars:
     runs-on: ubuntu-latest
     env:
-      API_URL: ${{ vars.API_URL }}
-      POSTGRES_URL: ${{ secrets.POSTGRES_URL }}
+      API_KEY: ${{ secrets.API_KEY }}
+      BUN_VERSION: ${{ vars.BUN_VERSION }}
 
     steps:
       - name: Echo Variables
-        run: echo "API_URL:\ $API_URL"
+        run: echo "$BUN_VERSION"
       - name: Echo Secrets
-        run: echo "POSTGRES_URL:\ $POSTGRES_URL"
-
-  echo-prod:
-    environment: "Production"
-    runs-on: ubuntu-latest
-    env:
-      API_URL: ${{ vars.API_URL }}
-      POSTGRES_URL: ${{ secrets.POSTGRES_URL }}
-
-    steps:
-      - name: Echo Variables
-        run: echo "API_URL:\ $API_URL"
-      - name: Echo Secrets
-        run: echo "POSTGRES_URL:\ $POSTGRES_URL"
+        run: echo "$API_KEY"
